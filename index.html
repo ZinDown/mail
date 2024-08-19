@@ -2,10 +2,169 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=https://www.developermail.com/mail/">
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mailbox API Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        section {
+            margin-bottom: 20px;
+        }
+        input, textarea, button {
+            margin: 5px 0;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap; /* Allows for wrapped lines */
+        }
+    </style>
 </head>
 <body>
-    <p>If you are not redirected automatically, follow this <a href="https://www.developermail.com/mail/">link to developermail.com</a>.</p>
+    <h1>Mailbox API Interface</h1>
+    
+    <!-- Form to create a mailbox -->
+    <section>
+        <h2>Create Mailbox</h2>
+        <button id="create-mailbox">Create Mailbox</button>
+        <pre id="create-result">Result will be shown here...</pre>
+    </section>
+    
+    <!-- Form to delete a mailbox -->
+    <section>
+        <h2>Delete Mailbox</h2>
+        <input type="text" id="delete-email-id" placeholder="Email ID">
+        <input type="text" id="delete-email-token" placeholder="Email Token">
+        <button id="delete-mailbox">Delete Mailbox</button>
+        <pre id="delete-result">Result will be shown here...</pre>
+    </section>
+    
+    <!-- Form to list messages -->
+    <section>
+        <h2>List Messages</h2>
+        <input type="text" id="list-email-id" placeholder="Email ID">
+        <input type="text" id="list-email-token" placeholder="Email Token">
+        <button id="list-messages">List Messages</button>
+        <pre id="list-result">Result will be shown here...</pre>
+    </section>
+    
+    <!-- Form to get messages content -->
+    <section>
+        <h2>Get Messages Content</h2>
+        <input type="text" id="content-email-id" placeholder="Email ID">
+        <input type="text" id="content-email-token" placeholder="Email Token">
+        <textarea id="message-ids" placeholder='Message IDs (e.g., ["id1", "id2"])'></textarea>
+        <button id="get-messages-content">Get Messages Content</button>
+        <pre id="content-result">Result will be shown here...</pre>
+    </section>
+    
+    <script>
+        const base = "https://www.developermail.com/api/v1/mailbox";
+
+        async function createEmail() {
+            return await fetch(base, {
+                "headers": {
+                    "accept": "application/json",
+                    "accept-language": "en-US,en;q=0.9",
+                    "content-type": "application/json",
+                },
+                "method": "PUT",
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    return data.result;
+                } else {
+                    console.error(data.errors);
+                }
+            })
+            .catch(e => console.error(e));
+        }
+
+        async function deleteEmail(emailId, emailToken) {
+            return await fetch(`${base}/${emailId}`, {
+                "headers": {
+                    "accept-language": "en-US,en;q=0.9",
+                    "X-MailboxToken": emailToken,
+                },
+                "method": "DELETE",
+            })
+            .then(res => res.json())
+            .then(data => data.success)
+            .catch(e => console.error(e));
+        }
+
+        async function messageList(emailId, emailToken) {
+            return await fetch(`${base}/${emailId}`, {
+                "headers": {
+                    "accept-language": "en-US,en;q=0.9",
+                    "X-MailboxToken": emailToken,
+                },
+                "method": "GET",
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    return data.result;
+                } else {
+                    console.error(data.errors);
+                }
+            })
+            .catch(e => console.error(e));
+        }
+
+        async function getMessagesContent(emailId, messages, emailToken) {
+            return await fetch(`${base}/${emailId}/messages`, {
+                "headers": {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    "accept-language": "en-US,en;q=0.9",
+                    "X-MailboxToken": emailToken,
+                },
+                body: JSON.stringify(messages),
+                "method": "POST",
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    return data.result;
+                } else {
+                    console.error(data.errors);
+                }
+            })
+            .catch(e => console.error(e));
+        }
+
+        // Event listeners
+        document.getElementById('create-mailbox').addEventListener('click', async () => {
+            const result = await createEmail();
+            document.getElementById('create-result').textContent = JSON.stringify(result, null, 2);
+        });
+
+        document.getElementById('delete-mailbox').addEventListener('click', async () => {
+            const emailId = document.getElementById('delete-email-id').value;
+            const emailToken = document.getElementById('delete-email-token').value;
+            const success = await deleteEmail(emailId, emailToken);
+            document.getElementById('delete-result').textContent = success ? 'Mailbox deleted' : 'Failed to delete mailbox';
+        });
+
+        document.getElementById('list-messages').addEventListener('click', async () => {
+            const emailId = document.getElementById('list-email-id').value;
+            const emailToken = document.getElementById('list-email-token').value;
+            const messages = await messageList(emailId, emailToken);
+            document.getElementById('list-result').textContent = JSON.stringify(messages, null, 2);
+        });
+
+        document.getElementById('get-messages-content').addEventListener('click', async () => {
+            const emailId = document.getElementById('content-email-id').value;
+            const emailToken = document.getElementById('content-email-token').value;
+            const messages = JSON.parse(document.getElementById('message-ids').value);
+            const content = await getMessagesContent(emailId, messages, emailToken);
+            document.getElementById('content-result').textContent = JSON.stringify(content, null, 2);
+        });
+    </script>
 </body>
 </html>
