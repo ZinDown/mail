@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Viewer</title>
+    <title>Mail Service By KMT_LinTun</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -149,7 +149,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Email Service By LinTun </h1>
+        <h1>Email Service  </h1>
         <button id="generateEmail">Generate Random Email</button>
         <div id="emailAddress" class="info"></div>
         <button id="showMessages">Show All Messages</button>
@@ -181,7 +181,7 @@
             }
             
     function getRandomName() {
-            const names = ['Alice', 'Bob', 'Charlie', 'David', 'Eve'];
+            const names = ['lintun', 'thetpaing', 'supinya'];
             return names[Math.floor(Math.random() * names.length)];
         }
 
@@ -195,7 +195,7 @@
                  const domains = ['vjuum.com','txcct.com','rteet.com'];
             const dom = domains[Math.floor(Math.random() * domains.length)];
                 
-                const email = `lintun${randomNumber}@${dom}`;
+                const email = `${name}${randomNumber}@${dom}`;
                 currentEmail = email;
 
                 emailAddressDiv.textContent = `Generated Email: ${email}`;
