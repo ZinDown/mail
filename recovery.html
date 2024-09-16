@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇲🇲 Email Recovery By ลินทุน 🇲🇲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #eaf4f4;
+        }
+
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .info {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .message-list {
+            text-align: left;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-list h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .message-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            cursor: pointer;
+        }
+
+        .message-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dialog-content {
+            padding: 20px;
+            text-align: left;
+            width: 500px;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        .dialog-content h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .dialog-content p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .dialog-content pre {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dialog.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .dialog .dialog-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dialog .dialog-box button {
+            background-color: #dc3545;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .dialog .dialog-box button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🇲🇲 Mail Recovery By ลินทุน 🇲🇲</h1>
+        <label for="emailInput">Enter Email:</label>
+        <input type="email" id="emailInput" class="info" placeholder="e.g., lintun1258@rteet.com" required>
+        <button id="showMessages">Show All Messages</button>
+        <div id="messageList" class="message-list"></div>
+    </div>
+
+    <div id="dialog" class="dialog">
+        <div class="dialog-box">
+            <div id="dialogContent" class="dialog-content"></div>
+            <button id="closeDialog">Close</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const showMessagesButton = document.getElementById('showMessages');
+            const emailInput = document.getElementById('emailInput');
+            const messageListDiv = document.getElementById('messageList');
+            const dialog = document.getElementById('dialog');
+            const dialogContentDiv = document.getElementById('dialogContent');
+            const closeDialogButton = document.getElementById('closeDialog');
+
+            const apiBaseUrl = 'https://www.1secmail.com/api/v1/';
+
+            async function fetchMessages(email) {
+                if (!email) {
+                    messageListDiv.innerHTML = '<p>Please enter an email address.</p>';
+                    return;
+                }
+
+                try {
+                    const [login, domain] = email.split('@');
+                    const response = await fetch(`${apiBaseUrl}?action=getMessages&login=${login}&domain=${domain}`);
+                    const messages = await response.json();
+
+                    if (messages.length > 0) {
+                        displayMessageList(messages);
+                    } else {
+                        messageListDiv.innerHTML = '<p>😛 No messages found.😛</p>';
+                    }
+                } catch (error) {
+                    messageListDiv.innerHTML = '<p>Error fetching messages.</p>';
+                    console.error('Error fetching messages:', error);
+                }
+            }
+
+            function displayMessageList(messages) {
+                messageListDiv.innerHTML = '<h2>📚 Message List 📚</h2>';
+                messages.forEach(message => {
+                    const messageItem = document.createElement('div');
+                    messageItem.className = 'message-item';
+                    messageItem.textContent = `From: ${message.from} - Subject: ${message.subject}`;
+                    messageItem.dataset.messageId = message.id;
+                    messageItem.addEventListener('click', () => showMessageDialog(message.id));
+                    messageListDiv.appendChild(messageItem);
+                });
+            }
+
+            async function showMessageDialog(messageId) {
+                const email = emailInput.value;
+                if (!email) {
+                    dialogContentDiv.innerHTML = '<p>Please enter an email address.</p>';
+                    return;
+                }
+
+                try {
+                    const [login, domain] = email.split('@');
+                    const response = await fetch(`${apiBaseUrl}?action=readMessage&login=${login}&domain=${domain}&id=${messageId}`);
+                    const message = await response.json();
+                    dialogContentDiv.innerHTML = `
+                        <h2>Message Details</h2>
+                        <p><strong>From:</strong> ${message.from}</p>
+                        <p><strong>Subject:</strong> ${message.subject}</p>
+                        <p><strong>Message:</strong></p>
+                        <p>${message.textBody}</p>
+                    `;
+                    dialog.classList.add('show');
+                } catch (error) {
+                    dialogContentDiv.innerHTML = '<p>Error fetching message.</p>';
+                    console.error('Error fetching message:', error);
+                }
+            }
+
+            function closeDialog() {
+                dialog.classList.remove('show');
+            }
+
+            showMessagesButton.addEventListener('click', () => {
+                const email = emailInput.value;
+                fetchMessages(email);
+            });
+
+            closeDialogButton.addEventListener('click', closeDialog);
+        });
+    </script>
+</body>
+</html>
