@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mail Service By MKT_LinTun</title>
+    <title>🇲🇲 Mail Service By MKT_LinTun 🇹🇭</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -149,7 +149,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Email Service  </h1>
+        <h1>🇹🇭 Email Service By  ลินทุน 🇲🇲 </h1>
         <button id="generateEmail">Generate Random Email</button>
         <div id="emailAddress" class="info"></div>
         <button id="showMessages">Show All Messages</button>
@@ -181,7 +181,7 @@
             }
             
     function getRandomName() {
-            const names = ['lintun', 'thetpaing', 'supinya'];
+            const names = ['lintun', 'thetpaing', 'supinya','thazin'];
             return names[Math.floor(Math.random() * names.length)];
         }
 
@@ -207,7 +207,7 @@
 
             async function fetchMessages() {
                 if (!currentEmail) {
-                    messageListDiv.innerHTML = '<p>Please generate an email first.</p>';
+                    messageListDiv.innerHTML = '<p>💸 Please generate an email first.💸</p>';
                     return;
                 }
 
@@ -219,16 +219,16 @@
                     if (messages.length > 0) {
                         displayMessageList(messages);
                     } else {
-                        messageListDiv.innerHTML = '<p>No messages found.</p>';
+                        messageListDiv.innerHTML = '<p>🍑 No messages found.🍑</p>';
                     }
                 } catch (error) {
-                    messageListDiv.innerHTML = '<p>Error fetching messages.</p>';
+                    messageListDiv.innerHTML = '<p>💔 Error fetching messages. 💔</p>';
                     console.error('Error fetching messages:', error);
                 }
             }
 
             function displayMessageList(messages) {
-                messageListDiv.innerHTML = '<h2>Message List</h2>';
+                messageListDiv.innerHTML = '<h2>📓 Message List 📚</h2>';
                 messages.forEach(message => {
                     const messageItem = document.createElement('div');
                     messageItem.className = 'message-item';
