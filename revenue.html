@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Audience Network Report</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e8f5e9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        h1 {
+            color: #388e3c;
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-size: 1.2rem;
+            color: #388e3c;
+            display: block;
+            margin-bottom: 10px;
+        }
+        select {
+            padding: 12px 18px;
+            font-size: 1rem;
+            border: 2px solid #388e3c;
+            border-radius: 15px;
+            width: 100%;
+            background-color: #f1f8e9;
+            margin-bottom: 20px;
+        }
+        .report {
+            margin-top: 30px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .card {
+            padding: 20px;
+            background-color: rgba(0, 128, 255, 0.1); /* Default color with low opacity (blue) */
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card p {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #388e3c;
+            margin: 0;
+        }
+        .card span {
+            font-size: 1rem;
+            color: #388e3c;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* Specific colors for each card */
+        .card.revenue { background-color: rgba(0, 128, 255, 0.1); } /* Blue */
+        .card.impressions { background-color: rgba(255, 99, 71, 0.1); } /* Red */
+        .card.requests { background-color: rgba(34, 139, 34, 0.1); } /* Green */
+        .card.fillRate { background-color: rgba(255, 165, 0, 0.1); } /* Orange */
+        .card.clicks { background-color: rgba(238, 130, 238, 0.1); } /* Violet */
+        .card.ecpm { background-color: rgba(255, 223, 0, 0.1); } /* Yellow */
+        
+        /* Center the login button and style it */
+        #fb-login-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        #fb-login {
+            background-color: #388e3c; /* Green */
+            color: white;
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #fb-login:hover {
+            background-color: #2c6e2f; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Facebook Audience Network Report</h1>
+
+    <div id="fb-login-container">
+        <button id="fb-login" onclick="loginWithFacebook()">Login with Facebook</button>
+    </div>
+
+    <div id="report-container" style="display: none;">
+        <label for="time-period">Select Time Period:</label>
+        <select id="time-period">
+            <option value="Today">Today</option>
+            <option value="Yesterday">Yesterday</option>
+            <option value="Last 7 Days">Last 7 Days</option>
+            <option value="Last Month">Last Month</option>
+            <option value="This Month">This Month</option>
+            <option value="This Year">This Year</option>
+            <option value="Last 1 Year">Last 1 Year</option>
+        </select>
+
+        <div class="report">
+            <h3>Metrics</h3>
+            <div class="grid-container">
+                <div class="card revenue">
+                    <p id="revenue">-</p>
+                    <span>Revenue</span>
+                </div>
+                <div class="card impressions">
+                    <p id="impressions">-</p>
+                    <span>Impressions</span>
+                </div>
+                <div class="card requests">
+                    <p id="requests">-</p>
+                    <span>Requests</span>
+                </div>
+                <div class="card fillRate">
+                    <p id="fillRate">-</p>
+                    <span>Fill Rate</span>
+                </div>
+                <div class="card clicks">
+                    <p id="clicks">-</p>
+                    <span>Clicks</span>
+                </div>
+                <div class="card ecpm">
+                    <p id="ecpm">-</p>
+                    <span>eCPM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize Facebook SDK
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : 'YOUR_APP_ID', // Replace with your Facebook App ID
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v16.0'
+        });
+    };
+
+    // Load Facebook SDK script
+    (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    // Function to handle Facebook Login
+    function loginWithFacebook() {
+        FB.login(function(response) {
+            if (response.authResponse) {
+                // Logged in, now fetch the data
+                document.getElementById('fb-login-container').style.display = 'none';
+                document.getElementById('report-container').style.display = 'block';
+                fetchReport('Today');
+            } else {
+                alert('User cancelled login or did not fully authorize.');
+            }
+        }, {scope: 'ads_management,ads_read,pages_show_list'});
+    }
+
+    const accessToken = ''; // This will be set dynamically after login
+    const adAccountId = ''; // This will be fetched dynamically
+
+    // Function to fetch report data from the Facebook Graph API
+    function fetchReport(timePeriod) {
+        FB.api('/me', { fields: 'id,name,accounts' }, function(response) {
+            if (response && response.accounts) {
+                // Assuming first ad account is selected, replace with logic to select your desired account
+                const account = response.accounts.data[0];
+                accessToken = response.authResponse.accessToken;
+                adAccountId = account.id;
+
+                const apiUrl = `https://graph.facebook.com/v16.0/act_${adAccountId}/insights`;
+
+                const { since, until } = getTimePeriodDateRange(timePeriod);
+                fetch(`${apiUrl}?access_token=${accessToken}&time_range[start_date]=${since}&time_range[end_date]=${until}&fields=requests,impressions,clicks,ecpm,fill_rate,revenue`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const report = data.data[0]; // Assuming the first element contains the data for the selected period
+                        document.getElementById('revenue').innerText = report.revenue || '-';
+                        document.getElementById('impressions').innerText = report.impressions || '-';
+                        document.getElementById('requests').innerText = report.requests || '-';
+                        document.getElementById('fillRate').innerText = report.fill_rate || '-';
+                        document.getElementById('clicks').innerText = report.clicks || '-';
+                        document.getElementById('ecpm').innerText = report.ecpm || '-';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        alert('Failed to fetch report data.');
+                    });
+            }
+        });
+    }
+
+    // Helper function to calculate date ranges for each time period
+    function getTimePeriodDateRange(timePeriod) {
+        let since, until;
+        const today = new Date();
+
+        switch (timePeriod) {
+            case 'Today':
+                since = until = today.toISOString().split('T')[0];
+                break;
+            case 'Yesterday':
+                today.setDate(today.getDate() - 1);
+                since = until = today.toISOString().split('T')[0];
+                break;
+            case 'Last 7 Days':
+                const sevenDaysAgo = new Date(today.setDate(today.getDate() - 7));
+                since = sevenDaysAgo.toISOString().split('T')[0];
+                until = new Date().toISOString().split('T')[0];
+                break;
+            case 'Last Month':
+                today.setMonth(today.getMonth() - 1);
+                since = today.toISOString().split('T')[0];
+                until = new Date().toISOString().split('T')[0];
+                break;
+            case 'This Month':
+                today.setDate(1);
+                since = today.toISOString().split('T')[0];
+                until = new Date().toISOString().split('T')[0];
+                break;
+            case 'This Year':
+                today.setMonth(0); // Start of the year
+                today.setDate(1);  // Start of the year
+                since = today.toISOString().split('T')[0];
+                until = new Date().toISOString().split('T')[0];
+                break;
+            case 'Last 1 Year':
+                today.setFullYear(today.getFullYear() - 1);
+                since = today.toISOString().split('T')[0];
+                until = new Date().toISOString().split('T')[0];
+                break;
+        }
+        return { since, until };
+    }
+</script>
+
+</body>
+</html>
