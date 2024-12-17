@@ -14,7 +14,6 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            flex-direction: column;
         }
         h1 {
             color: #388e3c;
@@ -24,11 +23,31 @@
         }
         .container {
             max-width: 900px;
-            margin: auto;
+            width: 100%;
             padding: 30px;
             background-color: #ffffff;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #fb-login-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #fb-login-button {
+            padding: 12px 20px;
+            background-color: #388e3c;
+            color: white;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #fb-login-button:hover {
+            background-color: #2c6e2f;
+        }
+        .report {
+            display: none;
         }
         label {
             font-size: 1.2rem;
@@ -44,9 +63,6 @@
             width: 100%;
             background-color: #f1f8e9;
             margin-bottom: 20px;
-        }
-        .report {
-            margin-top: 30px;
         }
         .grid-container {
             display: grid;
@@ -84,38 +100,18 @@
         .card.fillRate { background-color: rgba(255, 165, 0, 0.1); } /* Orange */
         .card.clicks { background-color: rgba(238, 130, 238, 0.1); } /* Violet */
         .card.ecpm { background-color: rgba(255, 223, 0, 0.1); } /* Yellow */
-        
-        /* Center the login button and style it */
-        #fb-login-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 50px;
-        }
-        #fb-login {
-            background-color: #388e3c; /* Green */
-            color: white;
-            font-size: 1.2rem;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        #fb-login:hover {
-            background-color: #2c6e2f; /* Darker green on hover */
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Facebook Audience Network Report</h1>
+    <h1>Facebook Audience Network </h1>
 
     <div id="fb-login-container">
-        <button id="fb-login" onclick="loginWithFacebook()">Login with Facebook</button>
+        <button id="fb-login-button" onclick="loginWithFacebook()">Login with Facebook</button>
     </div>
 
-    <div id="report-container" style="display: none;">
+    <div class="report" id="report-container">
         <label for="time-period">Select Time Period:</label>
         <select id="time-period">
             <option value="Today">Today</option>
@@ -127,50 +123,56 @@
             <option value="Last 1 Year">Last 1 Year</option>
         </select>
 
-        <div class="report">
-            <h3>Metrics</h3>
-            <div class="grid-container">
-                <div class="card revenue">
-                    <p id="revenue">-</p>
-                    <span>Revenue</span>
-                </div>
-                <div class="card impressions">
-                    <p id="impressions">-</p>
-                    <span>Impressions</span>
-                </div>
-                <div class="card requests">
-                    <p id="requests">-</p>
-                    <span>Requests</span>
-                </div>
-                <div class="card fillRate">
-                    <p id="fillRate">-</p>
-                    <span>Fill Rate</span>
-                </div>
-                <div class="card clicks">
-                    <p id="clicks">-</p>
-                    <span>Clicks</span>
-                </div>
-                <div class="card ecpm">
-                    <p id="ecpm">-</p>
-                    <span>eCPM</span>
-                </div>
+        <div class="grid-container">
+            <!-- Revenue Card -->
+            <div class="card revenue">
+                <p id="revenue">-</p>
+                <span>Revenue</span>
+            </div>
+
+            <!-- Impressions Card -->
+            <div class="card impressions">
+                <p id="impressions">-</p>
+                <span>Impressions</span>
+            </div>
+
+            <!-- Requests Card -->
+            <div class="card requests">
+                <p id="requests">-</p>
+                <span>Requests</span>
+            </div>
+
+            <!-- Fill Rate Card -->
+            <div class="card fillRate">
+                <p id="fillRate">-</p>
+                <span>Fill Rate</span>
+            </div>
+
+            <!-- Clicks Card -->
+            <div class="card clicks">
+                <p id="clicks">-</p>
+                <span>Clicks</span>
+            </div>
+
+            <!-- eCPM Card -->
+            <div class="card ecpm">
+                <p id="ecpm">-</p>
+                <span>eCPM</span>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Initialize Facebook SDK
     window.fbAsyncInit = function() {
         FB.init({
-            appId      : 'YOUR_APP_ID', // Replace with your Facebook App ID
+            appId      : '657350708853295', // Replace with your Facebook App ID
             cookie     : true,
             xfbml      : true,
             version    : 'v16.0'
         });
     };
 
-    // Load Facebook SDK script
     (function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
@@ -179,39 +181,37 @@
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
 
-    // Function to handle Facebook Login
+    // Custom Login Button Function
     function loginWithFacebook() {
         FB.login(function(response) {
             if (response.authResponse) {
-                // Logged in, now fetch the data
+                console.log('Login successful:', response);
                 document.getElementById('fb-login-container').style.display = 'none';
                 document.getElementById('report-container').style.display = 'block';
                 fetchReport('Today');
             } else {
+                console.log('Login failed:', response);
                 alert('User cancelled login or did not fully authorize.');
             }
         }, {scope: 'ads_management,ads_read,pages_show_list'});
     }
 
-    const accessToken = ''; // This will be set dynamically after login
-    const adAccountId = ''; // This will be fetched dynamically
-
-    // Function to fetch report data from the Facebook Graph API
     function fetchReport(timePeriod) {
         FB.api('/me', { fields: 'id,name,accounts' }, function(response) {
+            console.log('Facebook User Data:', response);
             if (response && response.accounts) {
-                // Assuming first ad account is selected, replace with logic to select your desired account
                 const account = response.accounts.data[0];
-                accessToken = response.authResponse.accessToken;
-                adAccountId = account.id;
+                const accessToken = FB.getAuthResponse().accessToken;
+                const adAccountId = account.id;
 
                 const apiUrl = `https://graph.facebook.com/v16.0/act_${adAccountId}/insights`;
-
                 const { since, until } = getTimePeriodDateRange(timePeriod);
+
                 fetch(`${apiUrl}?access_token=${accessToken}&time_range[start_date]=${since}&time_range[end_date]=${until}&fields=requests,impressions,clicks,ecpm,fill_rate,revenue`)
                     .then(response => response.json())
                     .then(data => {
-                        const report = data.data[0]; // Assuming the first element contains the data for the selected period
+                        console.log('Report Data:', data);
+                        const report = data.data[0];
                         document.getElementById('revenue').innerText = report.revenue || '-';
                         document.getElementById('impressions').innerText = report.impressions || '-';
                         document.getElementById('requests').innerText = report.requests || '-';
@@ -227,7 +227,6 @@
         });
     }
 
-    // Helper function to calculate date ranges for each time period
     function getTimePeriodDateRange(timePeriod) {
         let since, until;
         const today = new Date();
@@ -256,8 +255,8 @@
                 until = new Date().toISOString().split('T')[0];
                 break;
             case 'This Year':
-                today.setMonth(0); // Start of the year
-                today.setDate(1);  // Start of the year
+                today.setMonth(0);
+                today.setDate(1);
                 since = today.toISOString().split('T')[0];
                 until = new Date().toISOString().split('T')[0];
                 break;
